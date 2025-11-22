@@ -20,14 +20,21 @@ class Dictionary:
     def save(self, key: Any, value: Any) -> None:
         key_hash = hash(key)
         position_in_dict = abs(key_hash) % self.capacity
+        first_deleted_position = 0
+        deleted_found = False
         while True:
-            if (self.buckets[position_in_dict][0] is None
-                    or self.buckets[position_in_dict][0] == self.DELETED):
+            if self.buckets[position_in_dict][0] is None:
+                if deleted_found:
+                    position_in_dict = first_deleted_position
                 self.buckets[position_in_dict][0] = key
                 self.buckets[position_in_dict][1] = key_hash
                 self.buckets[position_in_dict][2] = value
                 self.size += 1
                 break
+            if (self.buckets[position_in_dict][0] == self.DELETED
+                    and not deleted_found):
+                first_deleted_position = position_in_dict
+                deleted_found = True
             if self.buckets[position_in_dict][0] is not None:
                 if self.buckets[position_in_dict][0] == key:
                     self.buckets[position_in_dict][0] = key
@@ -60,6 +67,7 @@ class Dictionary:
     def __getitem__(self, key: Any) -> Any:
         key_hash = hash(key)
         position_in_dict = abs(key_hash) % self.capacity
+        rounds = 0
         while True:
             if self.buckets[position_in_dict][0] is None:
                 raise KeyError("!!! NO KEY OF THIS NAME !!!")
@@ -68,10 +76,14 @@ class Dictionary:
             position_in_dict += 1
             if position_in_dict > self.capacity - 1:
                 position_in_dict = 0
+            rounds += 1
+            if rounds == self.capacity:
+                raise KeyError("!!! NO KEY OF THIS NAME !!!")
 
     def __delitem__(self, key: Any) -> None:
         key_hash = hash(key)
         position_in_dict = abs(key_hash) % self.capacity
+        rounds = 0
         while True:
             if self.buckets[position_in_dict][0] is None:
                 raise KeyError("!!! NO KEY OF THIS NAME !!!")
@@ -82,6 +94,9 @@ class Dictionary:
             position_in_dict += 1
             if position_in_dict > self.capacity - 1:
                 position_in_dict = 0
+            rounds += 1
+            if rounds == self.capacity:
+                raise KeyError("!!! NO KEY OF THIS NAME !!!")
 
     def __len__(self) -> int:
         return self.length()
