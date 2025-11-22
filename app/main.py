@@ -22,6 +22,7 @@ class Dictionary:
         position_in_dict = abs(key_hash) % self.capacity
         first_deleted_position = 0
         deleted_found = False
+        rounds = 0
         while True:
             if self.buckets[position_in_dict][0] is None:
                 if deleted_found:
@@ -31,7 +32,7 @@ class Dictionary:
                 self.buckets[position_in_dict][2] = value
                 self.size += 1
                 break
-            if (self.buckets[position_in_dict][0] == self.DELETED
+            if (self.buckets[position_in_dict][0] is self.DELETED
                     and not deleted_found):
                 first_deleted_position = position_in_dict
                 deleted_found = True
@@ -44,11 +45,14 @@ class Dictionary:
             position_in_dict += 1
             if position_in_dict > self.capacity - 1:
                 position_in_dict = 0
+            rounds += 1
+            if rounds == self.capacity:
+                raise Exception("!!! DICTIONARY FULL !!!")
 
     def grow_dict(self) -> None:
         temp_buckets = []
         for bucket in self.buckets:
-            if bucket[0] is not None and bucket[0] != self.DELETED:
+            if bucket[0] is not None and bucket[0] is not self.DELETED:
                 temp_buckets += [bucket]
         self.capacity = self.capacity * 2
         self.clear()
