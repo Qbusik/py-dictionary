@@ -12,7 +12,7 @@ class Dictionary:
 
     def __repr__(self) -> str:
         dict_buckets = [self.buckets[i] for i in range(self.capacity)]
-        return f'DICT -> {dict_buckets}'
+        return f"DICT -> {dict_buckets}"
 
     def length(self) -> int:
         return self.size
